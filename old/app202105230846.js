@@ -30,78 +30,32 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
 
     let cu;
     let balls;
-    let flagTimer = 1;
-    let countStage = 1;
+    let startTime;
+    let nowTime;
+    //let Game = {};
 
-    // Stats.js  https://github.com/mrdoob/stats.js/
-    let stats = new Stats();
+    //add Stats.js  https://github.com/mrdoob/stats.js/
+    var stats = new Stats();
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.right = '0px';
     stats.domElement.style.top = '0px';
     document.body.appendChild(stats.domElement);
 
     window.addEventListener('load', () => {
-        let startTime;
-        let endTime;
-
-        // INITIALIZE 処理
         // canvas初期化
         cu = new CanvasUtil(document.getElementById('canvas'));
-        cu.matchSize();
-        cu.setSize(400,800);
-        //cu.clear();
-        
-        cu.drawText30('時間計測ゲーム', 100, 200, 1000, 'black');
-        cu.drawText30('touch any area', 100, 250, 1000, 'black');
+        //cu.matchSize();
+        cu.setSize();
+        cu.clear();
 
-        // INPUT処理
         window.addEventListener('click', (eve) => {            
-            // タイマー処理
-            if (flagTimer == 1) {
-                cu.clear();
-                cu.drawText30(countStage+'回目', 150, 150, 1000, 'black');
-                cu.drawText30('タッチでスタートする', 10, 200, 1000, 'black');
-                cu.drawText30('3秒後にもう一度タッチして!', 10, 250, 1000, 'black');
-                flagTimer = 2;
-            } else if (flagTimer == 2) {
-                // 計測開始
-                baseTime = new Date();
-                baseTime.setMilliseconds(3000);
-                startTime = new Date();
-                flagTimer = 3;
-                render();
-            } else if (flagTimer == 3) {
-                // 計測終了
-                cancelAnimationFrame(callbackID);
-                diffTime = endTime - startTime;
-                resultTime1 = diffTime / 1000;
-                resultTime2 = (3000 - diffTime) / 1000 * -1;
-                result1 = '経過時間 ' + resultTime1 + ' 秒';
-                result2 = '誤差 ' + resultTime2 + ' 秒';
-                cu.drawText40(result1, 10, 250, 1000, 'black');
-                cu.drawText40(result2, 10, 300, 1000, 'black');
-                countStage++;
-                if (countStage == 4){
-                    flagTimer = 9;
-                } else {
-                    flagTimer = 1;
-                }
-            } else if (flagTimer == 9) {
-                cu.clear();
-                cu.drawText40('ゲームクリア！', 50, 300, 1000, 'black');
-                flagTimer = 0;
-            } else if (flagTimer == 0) {
-                cu.clear();
-                cu.drawText30('時間計測ゲーム', 100, 200, 1000, 'black');
-                cu.drawText30('touch any area', 100, 250, 1000, 'black');
-                flagTimer = 1;
-                countStage = 1;
-            }
             // ランダムに色を決める
             let colorIndex = Math.floor(Math.random() * FIRE_COLORS.length);
+
             // 初期位置を決める
             let x = eve.clientX;
             let y = eve.clientY;
+
             // 初期位置に FIRE_COUNT 個の火花を生成する
             for(let i = 0; i < FIRE_COUNT; ++i){
                 // ランダムに飛び散る方向を変える
@@ -124,16 +78,12 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
 
         balls = [];
 
-        // UPDATE, DRAW 処理
+        render();
+
         function render(){
             // 画面をクリア            
             cu.clear();
-            // 時刻を更新
-            endTime = new Date();
-            cu.drawText(startTime.getSeconds(), 50, 70, 1000, 'gray');
-            cu.drawText(startTime.getMilliseconds(), 50, 100, 1000, 'gray');
-            cu.drawText(endTime.getSeconds(), 50, 130, 1000, 'gray');
-            cu.drawText(endTime.getMilliseconds(), 50, 160, 1000, 'gray');
+            // 画面を更新
             // すべてのボールの位置を更新する
             balls.map((ball, index) => {
                 // ボールを動かす
@@ -153,14 +103,10 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
                     balls.splice(index, 1);
                 }
             });
-            
+            // ステータスを更新
+            stats.update();
             // 画面更新
-            if (flagTimer) {
-                stats.update();
-            } else {
-                stats.end();
-            }
-            callbackID = requestAnimationFrame(render);
+            requestAnimationFrame(render);
         }
     }, false);
 })();

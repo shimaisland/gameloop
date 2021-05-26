@@ -30,8 +30,7 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
 
     let cu;
     let balls;
-    let flagTimer = 1;
-    let countStage = 1;
+    let flagTimer;
 
     // Stats.js  https://github.com/mrdoob/stats.js/
     let stats = new Stats();
@@ -47,61 +46,50 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
         // INITIALIZE 処理
         // canvas初期化
         cu = new CanvasUtil(document.getElementById('canvas'));
-        cu.matchSize();
+        //cu.matchSize();
         cu.setSize(400,800);
-        //cu.clear();
-        
-        cu.drawText30('時間計測ゲーム', 100, 200, 1000, 'black');
-        cu.drawText30('touch any area', 100, 250, 1000, 'black');
+        cu.clear();
+        cu.drawText30('　タッチでスタートする', 10, 200, 1000, 'black');
+        cu.drawText30('3秒後にもう一度タッチして!', 10, 250, 1000, 'black');
 
         // INPUT処理
         window.addEventListener('click', (eve) => {            
             // タイマー処理
-            if (flagTimer == 1) {
-                cu.clear();
-                cu.drawText30(countStage+'回目', 150, 150, 1000, 'black');
-                cu.drawText30('タッチでスタートする', 10, 200, 1000, 'black');
-                cu.drawText30('3秒後にもう一度タッチして!', 10, 250, 1000, 'black');
-                flagTimer = 2;
-            } else if (flagTimer == 2) {
+            if (!flagTimer) {
                 // 計測開始
                 baseTime = new Date();
                 baseTime.setMilliseconds(3000);
                 startTime = new Date();
-                flagTimer = 3;
+                flagTimer = true;
                 render();
-            } else if (flagTimer == 3) {
+            } else {
                 // 計測終了
+                flagTimer = false;
                 cancelAnimationFrame(callbackID);
+
                 diffTime = endTime - startTime;
                 resultTime1 = diffTime / 1000;
                 resultTime2 = (3000 - diffTime) / 1000 * -1;
                 result1 = '経過時間 ' + resultTime1 + ' 秒';
-                result2 = '誤差 ' + resultTime2 + ' 秒';
+                result2 = '　誤差 ' + resultTime2 + ' 秒';
                 cu.drawText40(result1, 10, 250, 1000, 'black');
                 cu.drawText40(result2, 10, 300, 1000, 'black');
-                countStage++;
-                if (countStage == 4){
-                    flagTimer = 9;
-                } else {
-                    flagTimer = 1;
-                }
-            } else if (flagTimer == 9) {
-                cu.clear();
-                cu.drawText40('ゲームクリア！', 50, 300, 1000, 'black');
-                flagTimer = 0;
-            } else if (flagTimer == 0) {
-                cu.clear();
-                cu.drawText30('時間計測ゲーム', 100, 200, 1000, 'black');
-                cu.drawText30('touch any area', 100, 250, 1000, 'black');
-                flagTimer = 1;
-                countStage = 1;
             }
+            /*
+            console.log(baseTime);
+            console.log(startTime);
+            console.log(endTime);
+            console.log(endTime - baseTime);
+            console.log(endTime - startTime);
+            */
+
             // ランダムに色を決める
             let colorIndex = Math.floor(Math.random() * FIRE_COLORS.length);
+
             // 初期位置を決める
             let x = eve.clientX;
             let y = eve.clientY;
+
             // 初期位置に FIRE_COUNT 個の火花を生成する
             for(let i = 0; i < FIRE_COUNT; ++i){
                 // ランダムに飛び散る方向を変える
@@ -134,6 +122,7 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
             cu.drawText(startTime.getMilliseconds(), 50, 100, 1000, 'gray');
             cu.drawText(endTime.getSeconds(), 50, 130, 1000, 'gray');
             cu.drawText(endTime.getMilliseconds(), 50, 160, 1000, 'gray');
+            
             // すべてのボールの位置を更新する
             balls.map((ball, index) => {
                 // ボールを動かす
