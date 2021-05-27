@@ -32,8 +32,6 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
     let balls;
     let flagTimer = 1;
     let countStage = 1;
-    let timeArray = [1000,2000,3000,4000,5000];
-    let targetTime;
 
     // Stats.js  https://github.com/mrdoob/stats.js/
     let stats = new Stats();
@@ -54,40 +52,34 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
         //cu.clear();
         
         cu.drawText30('時間計測ゲーム', 100, 200, 1000, 'black');
-        cu.drawText30('どこかをタッチして!', 100, 300, 1000, 'black');
+        cu.drawText30('touch any area', 100, 250, 1000, 'black');
 
         // INPUT処理
-        window.addEventListener('click', (eve) => {
+        window.addEventListener('click', (eve) => {            
             // タイマー処理
             if (flagTimer == 1) {
-                targetTime = timeArray[Math.floor(Math.random() * timeArray.length)];
                 cu.clear();
                 cu.drawText30(countStage+'回目', 150, 150, 1000, 'black');
-                cu.drawText30('どこかをタッチでスタート', 10, 220, 1000, 'black');
-                cu.drawText60(targetTime/1000, 10, 400, 1000, 'black');
-                cu.drawText30('秒後にもう一度タッチして!', 10, 450, 1000, 'black');
+                cu.drawText30('タッチでスタートする', 10, 200, 1000, 'black');
+                cu.drawText30('3秒後にもう一度タッチして!', 10, 250, 1000, 'black');
                 flagTimer = 2;
             } else if (flagTimer == 2) {
                 // 計測開始
+                baseTime = new Date();
+                baseTime.setMilliseconds(3000);
                 startTime = new Date();
                 flagTimer = 3;
                 render();
             } else if (flagTimer == 3) {
                 // 計測終了
                 cancelAnimationFrame(callbackID);
-                lapsedTime = endTime - startTime;
-                resultTime1 = lapsedTime / 1000;
-                resultTime2 = (targetTime - lapsedTime) / 1000 * -1;
-                resultScore = 1000 - Math.abs(targetTime - lapsedTime);
-                if (resultScore < 0){
-                    resultScore = 0;
-                }
+                diffTime = endTime - startTime;
+                resultTime1 = diffTime / 1000;
+                resultTime2 = (3000 - diffTime) / 1000 * -1;
                 result1 = '経過時間 ' + resultTime1 + ' 秒';
                 result2 = '誤差 ' + resultTime2 + ' 秒';
-                result3 = '得点 ' + resultScore + ' 点';
                 cu.drawText40(result1, 10, 250, 1000, 'black');
                 cu.drawText40(result2, 10, 300, 1000, 'black');
-                cu.drawText40(result3, 10, 350, 1000, 'black');
                 countStage++;
                 if (countStage == 4){
                     flagTimer = 9;

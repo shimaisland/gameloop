@@ -73,4 +73,13 @@ class CanvasUtil {
         var textWidth = this.ctx.measureText( text ).width
         this.ctx.fillText(text, (this.canvas.width - textWidth) / 2, y);
     }
+    drawText60(text, x, y, width, color){
+        // 色が指定されている場合はスタイルを設定する
+        if(color != null){
+            this.ctx.fillStyle = color;
+        }
+        this.ctx.font = "150px sans-serif";
+        var textWidth = this.ctx.measureText( text ).width
+        this.ctx.fillText(text, (this.canvas.width - textWidth) / 2, y);
+    }
 }
