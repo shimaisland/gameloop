@@ -8,7 +8,12 @@ https://qiita.com/katsukii/items/cfe9fd968ba0db603b1e
 通常の関数とアロー関数の違い
 https://qiita.com/suin/items/a44825d253d023e31e4d
 */
-    // 定数
+    const GAME_FPS = 30;
+    const CIRCLE_RADIUS = 20;
+    const CIRCLE_SPEED = 5;
+    const LINE_SPEED = 50;
+    const CIRCLE_COLOR = 'rgba(255, 64, 0, 0.8)';
+
     const FIRE_MAX_LIFE = Ball.maxLife;
     const FIRE_COUNT = 15;
     const FIRE_RADIUS = 30;
@@ -23,6 +28,13 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
         'rgba(  0, 200, 255, 0.5)'
     ];
 
+    let cu;
+    let balls;
+    let flagTimer = 1;
+    let countStage = 1;
+    let timeArray = [1000,2000,3000,4000,5000];
+    let targetTime;
+
     // Stats.js  https://github.com/mrdoob/stats.js/
     let stats = new Stats();
     stats.domElement.style.position = 'absolute';
@@ -31,15 +43,6 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
     document.body.appendChild(stats.domElement);
 
     window.addEventListener('load', () => {
-        let cu;
-        let balls;
-        let gameState = 1;
-        let stageCount = 1;
-        let timeArray = [1000,2000,3000,4000,5000];
-        let targetTime;
-        let rateArray = [1.0,1.05,1.1,1.15,1.2];
-        let randomVal;
-        let totalScore = 0;
         let startTime;
         let endTime;
 
@@ -56,55 +59,51 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
         // INPUT処理
         window.addEventListener('click', (eve) => {
             // タイマー処理
-            if (gameState == 1) {
-                randomVal = Math.floor(Math.random() * timeArray.length);
-                targetTime = timeArray[randomVal];
+            if (flagTimer == 1) {
+                targetTime = timeArray[Math.floor(Math.random() * timeArray.length)];
                 cu.clear();
-                cu.drawText30(stageCount+'回目', 150, 150, 1000, 'black');
+                cu.drawText30(countStage+'回目', 150, 150, 1000, 'black');
                 cu.drawText30('どこかをタッチでスタート', 10, 220, 1000, 'black');
                 cu.drawText60(targetTime/1000, 10, 400, 1000, 'black');
                 cu.drawText30('秒後にもう一度タッチして!', 10, 450, 1000, 'black');
-                gameState = 2;
-            } else if (gameState == 2) {
+                flagTimer = 2;
+            } else if (flagTimer == 2) {
                 // 計測開始
                 startTime = new Date();
-                gameState = 3;
+                flagTimer = 3;
                 render();
-            } else if (gameState == 3) {
+            } else if (flagTimer == 3) {
                 // 計測終了
                 cancelAnimationFrame(callbackID);
                 lapsedTime = endTime - startTime;
                 resultTime1 = lapsedTime / 1000;
                 resultTime2 = (targetTime - lapsedTime) / 1000 * -1;
-                resultScore = (1000 - Math.abs(targetTime - lapsedTime)) * rateArray[randomVal];
-                resultScore = Math.round(resultScore);
+                resultScore = 1000 - Math.abs(targetTime - lapsedTime);
                 if (resultScore < 0){
                     resultScore = 0;
                 }
-                totalScore = totalScore + resultScore;
                 result1 = '経過時間 ' + resultTime1 + ' 秒';
                 result2 = '誤差 ' + resultTime2 + ' 秒';
                 result3 = '得点 ' + resultScore + ' 点';
                 cu.drawText40(result1, 10, 250, 1000, 'black');
                 cu.drawText40(result2, 10, 300, 1000, 'black');
                 cu.drawText40(result3, 10, 350, 1000, 'black');
-                stageCount++;
-                if (stageCount == 4){
-                    gameState = 9;
+                countStage++;
+                if (countStage == 4){
+                    flagTimer = 9;
                 } else {
-                    gameState = 1;
+                    flagTimer = 1;
                 }
-            } else if (gameState == 9) {
+            } else if (flagTimer == 9) {
                 cu.clear();
-                cu.drawText40('総得点 ' + totalScore + ' 点', 50, 300, 1000, 'black');
-                cu.drawText40('ゲームクリア！', 50, 400, 1000, 'black');
-                gameState = 0;
-            } else if (gameState == 0) {
+                cu.drawText40('ゲームクリア！', 50, 300, 1000, 'black');
+                flagTimer = 0;
+            } else if (flagTimer == 0) {
                 cu.clear();
                 cu.drawText30('時間計測ゲーム', 100, 200, 1000, 'black');
                 cu.drawText30('touch any area', 100, 250, 1000, 'black');
-                gameState = 1;
-                stageCount = 1;
+                flagTimer = 1;
+                countStage = 1;
             }
             // ランダムに色を決める
             let colorIndex = Math.floor(Math.random() * FIRE_COLORS.length);
@@ -164,7 +163,7 @@ https://qiita.com/suin/items/a44825d253d023e31e4d
             });
             
             // 画面更新
-            if (gameState) {
+            if (flagTimer) {
                 stats.update();
             } else {
                 stats.end();
