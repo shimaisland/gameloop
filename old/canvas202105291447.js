@@ -47,7 +47,7 @@ class CanvasUtil {
         this.ctx.closePath();
         this.ctx.fill();
     }
-    drawButton(text, x, y, width, height, color){
+    drawButton(text, x, y, width, height, color, score){
         // テキスト表示
         this.ctx.font = "30px sans-serif";
         this.ctx.fillStyle = 'black';
@@ -61,29 +61,40 @@ class CanvasUtil {
         }
         this.ctx.beginPath();
         this.ctx.rect((this.canvas.width - textWidth) / 2,
-                        y - 50,
-                        textWidth,
-                        height);
+                           y - 50,
+                           textWidth,
+                           height);
         this.ctx.fill() ;
         this.ctx.stroke();
+        /*
+        this.canvas.addEventListener('click', (eve) => {
+            return function ff(){
+                var x = eve.clientX;
+                var y = eve.clientY;
+                if (this.ctx.isPointInPath(x, y)) {
+                    const url = encodeURI("https://shimaisland.github.io/gameloop/");
+                    window.open(`http://twitter.com/intent/tweet?text=経過時間当てゲームを${score}点でクリアした&hashtags=uneriE&url=${url}`);
+                }
+                
+            }
+        }, false);
+        */
+        this.canvas.addEventListener('click', tweetText.bind(this), false);
         this.ctx.closePath();
+        //this.canvas.removeEventListener('click',tweetText.bind(this),false);
         this.ctx.globalAlpha = 1.0;
-    }
-    addButton(){
-        //this.canvas.addEventListener('click', {score:totalScore,handleEvent:this.tweetText}, false);
-        this.canvas.addEventListener('click', this.tweetText, false);
-    }
-    removeButton(){
-        this.canvas.removeEventListener('click', this.tweetText, false);
-    }
 
-    tweetText(eve){
-        var x = eve.clientX;
-        var y = eve.clientY;
-        if (canvas.getContext('2d').isPointInPath(x, y)) {
-            const url = encodeURI("https://shimaisland.github.io/gameloop/");
-            window.open(`http://twitter.com/intent/tweet?text=経過時間計測ゲームを${totalScore}点でクリアした&hashtags=shimaisland&url=${url}`);
+        function tweetText(eve){
+            var x = eve.clientX;
+            var y = eve.clientY;
+            if (this.ctx.isPointInPath(x, y)) {
+                const url = encodeURI("https://shimaisland.github.io/gameloop/");
+                window.open(`http://twitter.com/intent/tweet?text=経過時間当てゲームを${score}点でクリアした&hashtags=uneriE&url=${url}`);
+            }
+            this.canvas.removeEventListener('click',tweetText.bind(this),false);
         }
+
+        
     }
     
     drawText(text, x, y, width, color){
@@ -93,15 +104,6 @@ class CanvasUtil {
         }
         this.ctx.font = "20px sans-serif";
         this.ctx.fillText(text, x, y, width);
-    }
-    drawText25(text, x, y, width, color){
-        // 色が指定されている場合はスタイルを設定する
-        if(color != null){
-            this.ctx.fillStyle = color;
-        }
-        this.ctx.font = "25px sans-serif";
-        var textWidth = this.ctx.measureText( text ).width;
-        this.ctx.fillText(text, (this.canvas.width - textWidth) / 2, y);
     }
     drawText30(text, x, y, width, color){
         // 色が指定されている場合はスタイルを設定する
